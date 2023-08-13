@@ -30,6 +30,7 @@ export class CategComponent implements OnInit {
     modifiedInput:string=''
     isEdit=false
     idEdit=0
+    deleteBtn:boolean=true
 
 
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
@@ -118,6 +119,11 @@ export class CategComponent implements OnInit {
         this.categoryService.updateData(this.idEdit,this.formT.value).subscribe(
           (resp:any)=>{
             console.log(resp)
+            this.formT.reset()
+            this.fetchCategs()
+
+
+
           }
         )
       }
@@ -154,7 +160,10 @@ export class CategComponent implements OnInit {
   }
 
   areChecked(event:any,id:number){
+    this.deleteBtn=false
+
     if(event.target.checked===true)
+
     this.checkedboxes.push(id)
     console.log('voici id',this.checkedboxes)
   }
@@ -162,6 +171,7 @@ export class CategComponent implements OnInit {
   delete(){
     this.categoryService.deleteData(this.checkedboxes).subscribe((resp)=>{
       console.log(resp)
+      this.fetchCategs()
 
 
     })
