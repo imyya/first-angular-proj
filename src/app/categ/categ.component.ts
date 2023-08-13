@@ -21,9 +21,15 @@ export class CategComponent implements OnInit {
     categData={
       libelle:''
     }
-    form2!:FormGroup
     IdsToBeDeleted:number[]=[]
     editModeControl: FormControl = new FormControl(false);
+    libelle:string=''
+    
+    deacButton:boolean=true
+    checkedboxes:number[]=[]
+    modifiedInput:string=''
+    isEdit=false
+    idEdit=0
 
 
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
@@ -31,37 +37,26 @@ export class CategComponent implements OnInit {
     }
 
     ngOnInit():void{
-    //  this.form = this.breukh.group({
-    //   libelle: [''],
-    //   prix:['']
-    //  });
+    this.fetchCategs()
+    
 
     this.formT=this.breukh.group({
-      libelle:['',[Validators.required,this.libelleValidator(this.categories)]]
+      libelle:['']
     })
-    this.fetchCategs()
 
-    this.form2=this.breukh.group({})
-    this.categories.forEach(category=>{
-      category.checkedControl=new FormControl(false)
-      this.form2.addControl(category.id.toString(),category.checkedControl)
-      console.log(`Form control name for category ${category.id}: ${category.id.toString()}`);
-    })
+    
+
+    
 
 
   }
   
    
 
-  fetchCategs(){
+ fetchCategs(){
     this.categoryService.getCategData(this.currentPage).subscribe((response:any)=>{
-      this.categories=response.data.data
-      this.paginationLinks=response.data.links
-      this.last=response.data.last_page
-      console.log(this.categories)
-      console.log(this.last)
-
-     
+    this.categories=response.data.data
+    this.last=response.data.last_page
    })
    }
    renderPage(event:number){
@@ -86,6 +81,7 @@ export class CategComponent implements OnInit {
       this.fetchCategs()
 
     }
+    
 
     previous(){
       if(this.currentPage-1<1) return
@@ -111,38 +107,73 @@ export class CategComponent implements OnInit {
     }
 
     submitFormFn(){
-      if(this.formT.valid){
-        console.log('c valid',this.formT.value)
+      if(!this.isEdit){
         this.categoryService.postData(this.formT.value).subscribe(
           (resp)=>{
           console.log(resp)
-          
-        })
-        this.formT.reset()
+          this.formT.reset()
+      })
       }
+      else{
+        this.categoryService.updateData(this.idEdit,this.formT.value).subscribe(
+          (resp:any)=>{
+            console.log(resp)
+          }
+        )
+      }
+       
+      
     }
 
+  // storeIdToBeDeleted(){
+  //   this.IdsToBeDeleted=Object.keys(this.form2.controls)//extract an array of keys which here are the ids
+  //   .filter((id)=> this.form2.controls[id].value)
+  //   .map(id=>+id)
 
-    libelleValidator(categ:string[]){//AbstractControl allows access to the control value
-      return (control:AbstractControl):ValidationErrors | null=>{
-        const libelle = control.value?.trim()
-        if(libelle && libelle.length>=3 && !categ.includes(libelle)){
-          return null
-        }
-        return {libelleUniq:true}
-      }
+  //   //formGroup is a container for form controls. A form control is an objct and when you form2.controls you access 
+  //   //an ojb that holds references to all the controls within the formgroup ex myForm.controls['username'] now one you do this
+  //   //u rmyForm.controls['username']retrieve the FormControl associated with username and this FormControl (in reactiv form) contains various property and methods that provide comprehensive control over the form control's behavior and interaction
+  //   //like value, myForm.controls.[email].value 
+  //   console.log('they getting deleted', this.IdsToBeDeleted)
+  // }
+
+  collectCheckedCategories() {
+    const checkedCategories = this.categories.filter(category => category.checkedControl.value);
+    console.log('Checked Categories:', checkedCategories);
+  }
+
+
+
+  isValid(input:any){ 
+    if(input.value.length>=3  ){
+    this.deacButton= this.categories.some((elem:any)=>elem.libelle===input.value)
     }
+    else if(!this.deacButton){
+      this.deacButton=false
+    }
+  }
 
-  storeIdToBeDeleted(){
-    this.IdsToBeDeleted=Object.keys(this.form2.controls)//extract an array of keys which here are the ids
-    .filter((id)=> this.form2.controls[id].value)
-    .map(id=>+id)
+  areChecked(event:any,id:number){
+    if(event.target.checked===true)
+    this.checkedboxes.push(id)
+    console.log('voici id',this.checkedboxes)
+  }
 
-    //formGroup is a container for form controls. A form control is an objct and when you form2.controls you access 
-    //an ojb that holds references to all the controls within the formgroup ex myForm.controls['username'] now one you do this
-    //u rmyForm.controls['username']retrieve the FormControl associated with username and this FormControl (in reactiv form) contains various property and methods that provide comprehensive control over the form control's behavior and interaction
-    //like value, myForm.controls.[email].value 
-    console.log('they getting deleted', this.IdsToBeDeleted)
+  delete(){
+    this.categoryService.deleteData(this.checkedboxes).subscribe((resp)=>{
+      console.log(resp)
+
+
+    })
+  }
+
+  display(event:any,id:number){
+    this.idEdit=id
+    let found = this.categories.find((cat)=>cat.id===id)
+    this.modifiedInput=found.libelle
+    this.isEdit=true
+    
+
   }
 }
 
