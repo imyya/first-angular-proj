@@ -14,7 +14,6 @@ export class CategComponent implements OnInit {
 
     categories:any[]=[]
     paginationLinks:any[]=[]
-    //nextPageUrl: string | null = null
     pagination:number=1
     last:number=0
     currentPage:number=1
@@ -22,7 +21,7 @@ export class CategComponent implements OnInit {
       libelle:''
     }
     IdsToBeDeleted:number[]=[]
-    editModeControl: FormControl = new FormControl(false);
+    ajoutModeControl:boolean=true;
     libelle:string=''
     
     deacButton:boolean=true
@@ -31,7 +30,6 @@ export class CategComponent implements OnInit {
     isEdit=false
     idEdit=0
     deleteBtn:boolean=true
-
 
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
 
@@ -151,21 +149,24 @@ export class CategComponent implements OnInit {
 
 
   isValid(input:any){ 
+
     if(input.value.length>=3  ){
     this.deacButton= this.categories.some((elem:any)=>elem.libelle===input.value)
     }
     else if(!this.deacButton){
       this.deacButton=false
+
     }
   }
 
   areChecked(event:any,id:number){
-    this.deleteBtn=false
 
-    if(event.target.checked===true)
+    if(!this.ajoutModeControl && event.target.checked===true )
 
     this.checkedboxes.push(id)
     console.log('voici id',this.checkedboxes)
+    this.deleteBtn=false
+
   }
 
   delete(){
@@ -178,12 +179,19 @@ export class CategComponent implements OnInit {
   }
 
   display(event:any,id:number){
-    this.idEdit=id
-    let found = this.categories.find((cat)=>cat.id===id)
-    this.modifiedInput=found.libelle
-    this.isEdit=true
+    if(!this.ajoutModeControl){
+
+      this.idEdit=id
+      let found = this.categories.find((cat)=>cat.id===id)
+      this.modifiedInput=found.libelle
+      this.isEdit=true
+    }
     
 
+  }
+  switchToEdit(){
+    this.ajoutModeControl=!this.ajoutModeControl
+    
   }
 }
 

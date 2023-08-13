@@ -4,7 +4,7 @@
  
   <div class="form-switch offset-5">
     <label class="form-check-label me-5" for="flexSwitchCheckChecked" >ajout</label>
-    <input [(ngModel)]="editModeControl" class="form-check-input swtch" type="checkbox" role="switch" id="editSwitch" checked  />
+    <input (change)="switchToEdit()" class="form-check-input swtch" type="checkbox" role="switch" id="editSwitch" checked  />
     <label class="form-check-label" for="editSwitch" >edit</label>
   </div>
 
@@ -25,7 +25,7 @@
   
    <div class="row align-items-center">
         <h3 class="col-4 mt-5 underline" style="text-decoration: underline;">Liste des catégories</h3>
-        <button class="col-1 btn btn-danger" (click)="delete()" [disabled]="deleteBtn" >Supprimer</button>
+        <button class="col-1 btn btn-danger" (click)="delete()" [disabled]="deleteBtn " >Supprimer</button>
     </div>
 
 
