@@ -30,6 +30,10 @@ export class CategComponent implements OnInit {
     isEdit=false
     idEdit=0
     deleteBtn:boolean=true
+    isChecked:number[]=[]
+    activDelete=true
+    allchecked=false
+    head=false
 
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
 
@@ -45,7 +49,7 @@ export class CategComponent implements OnInit {
 
     
 
-    
+
 
 
   }
@@ -56,6 +60,9 @@ export class CategComponent implements OnInit {
     this.categoryService.getCategData(this.currentPage).subscribe((response:any)=>{
     this.categories=response.data.data
     this.last=response.data.last_page
+    this.categories.forEach(cat=>{
+      cat.checked=this.isChecked.includes(cat.id)
+    })
    })
    }
    renderPage(event:number){
@@ -111,6 +118,7 @@ export class CategComponent implements OnInit {
           (resp)=>{
           console.log(resp)
           this.formT.reset()
+          this.fetchCategs()
       })
       }
       else{
@@ -161,11 +169,15 @@ export class CategComponent implements OnInit {
 
   areChecked(event:any,id:number){
 
-    if(!this.ajoutModeControl && event.target.checked===true )
+    if(!this.ajoutModeControl  && event.target.checked===true ){
 
-    this.checkedboxes.push(id)
-    console.log('voici id',this.checkedboxes)
-    this.deleteBtn=false
+      console.log('ibrahim')
+  
+      this.checkedboxes.push(id)
+      console.log('voici id',this.checkedboxes)
+      this.deleteBtn=false
+    }
+
 
   }
 
@@ -173,12 +185,15 @@ export class CategComponent implements OnInit {
     this.categoryService.deleteData(this.checkedboxes).subscribe((resp)=>{
       console.log(resp)
       this.fetchCategs()
+      this.head=false
+
 
 
     })
   }
 
   display(event:any,id:number){
+    console.log(this.ajoutModeControl)
     if(!this.ajoutModeControl){
 
       this.idEdit=id
@@ -190,8 +205,31 @@ export class CategComponent implements OnInit {
 
   }
   switchToEdit(){
-    this.ajoutModeControl=!this.ajoutModeControl
+    this.ajoutModeControl=false
+    console.log('here')
     
   }
+
+  checkAll(event:any){
+    if(event.target.checked){
+      this.head=true
+      this.categories.forEach(cat=>{
+      this.isChecked.push(cat.id)
+      this.checkedboxes.push(cat.id)
+      })
+      this.fetchCategs()
+      this.deleteBtn=false
+      
+
+    }
+    else{
+
+      this.isChecked=[]
+      this.fetchCategs()
+    }
+    
+  }
+
+  
 }
 

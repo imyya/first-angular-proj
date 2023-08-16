@@ -28,6 +28,10 @@ export class CategoryService {
   
     return this.http.delete(url, { ...options, body: requestBody });
   }
+  allcategs(){
+    return this.http.get(`${this.baseUrl}/categories/all`)
+
+  }
 
   
   updateData(id: number, newData: any): any {
@@ -41,6 +45,25 @@ export class CategoryService {
     return this.http.put(url, newData, options);
   }
 
-  
-  
+  getArticleData(page:number){
+    return this.http.get(`${this.baseUrl}/articles/all?page=`+page)
+  }
+
+  getFournisseur(){
+    return this.http.get(`${this.baseUrl}/fournisseurs/all`)
+  }
+
+  countArticles(id:number){
+    return this.http.get(`${this.baseUrl}/articles/${id}`)
+
+  }
+
+  addArticle(articleData: any) {
+    const headers = new HttpHeaders();
+    // Ne spécifiez pas le type de contenu, laissez Angular gérer les en-têtes
+
+    return this.http.post(`${this.baseUrl}/articles/store`, articleData, { headers });
+  }
 }
+  
+

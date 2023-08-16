@@ -1,0 +1,20 @@
+input, select{
+    background-color: rgba(255, 254, 254, 0.939)!important;
+}
+.subutn{
+    background-color: rgba(163, 95, 7, 0.493);
+    box-shadow: 5px 5px 5px rgba(101, 101, 101, 0.283)
+}
+
+label{
+    color: rgba(146, 84, 2, 0.493);
+}
+
+.fournisseur-buttons button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}
+  

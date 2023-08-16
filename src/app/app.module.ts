@@ -6,13 +6,23 @@ import { AppComponent } from './app.component';
 import { CategComponent } from './categ/categ.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { ArticleComponent } from './article/article.component';
+import { FormComponent } from './form/form.component';
+import { ListeComponent } from './liste/liste.component';
+import { ItemComponent } from './item/item.component';
+import { PaginationComponent } from './pagination/pagination.component';
 //import { NgxPaginationModule } from 'ngx-pagination';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    CategComponent
+    CategComponent,
+    ArticleComponent,
+    FormComponent,
+    ListeComponent,
+    ItemComponent,
+    PaginationComponent
   ],
   imports: [
     BrowserModule,
@@ -21,6 +31,7 @@ import { HttpClientModule, HttpHeaders } from '@angular/common/http';
     HttpClientModule,
     //NgxPaginationModule
     FormsModule,
+    
   
 
   
