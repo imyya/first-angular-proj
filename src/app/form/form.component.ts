@@ -1,18 +1,22 @@
-import { Component, OnChanges, OnInit,SimpleChanges, Input } from '@angular/core';
+import { Component, OnChanges, OnInit,SimpleChanges, Input, Output } from '@angular/core';
 import { CategoryService } from '../category.service';
 import { FormBuilder, FormGroup, Validators,FormControl } from '@angular/forms';
+import { ArticleComponent } from '../article/article.component';
+import { ArticleService } from '../article.service';
+import { Category } from '../interface/category';
+import { Article } from '../interface/article';
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css'],
-  providers:[CategoryService]
+  providers:[CategoryService, ArticleComponent]
 
 })
 export class FormComponent implements OnInit ,OnChanges {
   articleForm!: FormGroup; 
-  fournisseurs:any[]=[]
-  categs:any[]=[]
+ @Input() fournisseurs:Category[]=[]
+ @Input() categs:Category[]=[]
   libelleInput:string=''
   categorie:number=0
   refInput:string=''
@@ -32,6 +36,7 @@ export class FormComponent implements OnInit ,OnChanges {
   prixInput:number | string=''
   stockInput:number | string=''
   fournisseurInput=''
+  @Output() addArticle!:Article
 
 
   
@@ -41,13 +46,13 @@ export class FormComponent implements OnInit ,OnChanges {
 
 
 
-  constructor(private breukh:FormBuilder, private categoryService:CategoryService){
+  constructor(private breukh:FormBuilder, private categoryService:CategoryService, private articleService:ArticleService){
 
   }
   
   ngOnInit(): void {
-    this.fetchFournisseur()
-    this.fetchcategs()
+   // this.fetchFournisseur()
+   // this.fetchcategs()
     //this.getCount()
 
     // this.articleForm = this.breukh.group({
@@ -67,43 +72,17 @@ export class FormComponent implements OnInit ,OnChanges {
       this.prixInput=newArticle.prix
       this.stockInput=newArticle.stock
       this.categorie=newArticle.categorie_id
-      // Effectuez les actions nécessaires ici
-      // Par exemple, pré-remplissez les champs du formulaire avec les valeurs de newArticle
+      
     }
   }
 
-  fetchFournisseur(){
-    this.categoryService.getFournisseur().subscribe((response:any)=>{
-      this.fournisseurs=response.data
-      console.log(this.fournisseurs)
-
-  })
-  }
 
 
- fetchcategs(){
-  this.categoryService.allcategs().subscribe((response:any)=>{
-  this.categs=response.data
-  console.log(this.categs)
-  })
-  }
-
-  getCount(){
-    this.categoryService.countArticles(this.categorie).subscribe((response:any)=>{
-      console.log('ha',this.categorie)
-      console.log('choo',response)
-      this.x= response.data + 1
-      
-      
-  })
-  }
   updateRef(){
     let categ = this.categs.find(cat=>cat.id===+this.categorie); 
     let libellePrefix = this.libelleInput.slice(0,3).toUpperCase()
     let categPrefix = categ ? categ.libelle.toUpperCase():''
     this.categoryService.countArticles(this.categorie).subscribe((response:any)=>{
-      console.log('ha',this.categorie)
-      console.log('choo',response)
       this.x= response.data + 1
     console.log('this x',this.x)
     this.refInput = libellePrefix ? `REF_${libellePrefix}_${categPrefix}`:''
