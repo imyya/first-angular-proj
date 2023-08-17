@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { CategoryService } from '../category.service';
 import { NonNullAssert } from '@angular/compiler';
+import { Response } from '../interface/response';
+import { Category } from '../interface/category';
+import { Data } from '../interface/data';
+import { CategoryResponse } from '../interface/category-response';
 @Component({
   selector: 'app-categ',
   templateUrl: './categ.component.html',
@@ -12,8 +16,7 @@ export class CategComponent implements OnInit {
     isActive: boolean = false;
     formT!: FormGroup;
 
-    categories:any[]=[]
-    paginationLinks:any[]=[]
+    categories:Category[]=[]
     pagination:number=1
     last:number=0
     currentPage:number=1
@@ -34,6 +37,7 @@ export class CategComponent implements OnInit {
     activDelete=true
     allchecked=false
     head=false
+    disableInput=true
 
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
 
@@ -49,6 +53,8 @@ export class CategComponent implements OnInit {
 
     
 
+    
+
 
 
 
@@ -57,13 +63,16 @@ export class CategComponent implements OnInit {
    
 
  fetchCategs(){
-    this.categoryService.getCategData(this.currentPage).subscribe((response:any)=>{
-    this.categories=response.data.data
+    this.categoryService.getCategData(this.currentPage).subscribe((response:Response<CategoryResponse>)=>{
+      console.log('response',response.data.categories)
+    this.categories=response.data.categories
     this.last=response.data.last_page
+    console.log(this.categories)
     this.categories.forEach(cat=>{
       cat.checked=this.isChecked.includes(cat.id)
     })
-   })
+     })
+     
    }
    renderPage(event:number){
     this.pagination=event
@@ -101,19 +110,19 @@ export class CategComponent implements OnInit {
       this.fetchCategs()
     }
 
-    submitForm(){
-      console.log('lol')
-      this.categoryService.postData(this.categData).subscribe(
-        (resp)=>{
-        console.log(resp)
+    // submitForm(){
+    //   console.log('lol')
+    //   this.categoryService.postData(this.categData).subscribe(
+    //     (resp)=>{
+    //     console.log(resp)
         
-      })
+    //   })
       
       
-    }
+    // }
 
     submitFormFn(){
-      if(!this.isEdit){
+      if(this.ajoutModeControl && this.idEdit===0){
         this.categoryService.postData(this.formT.value).subscribe(
           (resp)=>{
           console.log(resp)
@@ -122,11 +131,13 @@ export class CategComponent implements OnInit {
       })
       }
       else{
+        
+
         this.categoryService.updateData(this.idEdit,this.formT.value).subscribe(
-          (resp:any)=>{
-            console.log(resp)
+          (resp:Response<Category>)=>{
             this.formT.reset()
             this.fetchCategs()
+            return resp
 
 
 
@@ -149,20 +160,30 @@ export class CategComponent implements OnInit {
   //   console.log('they getting deleted', this.IdsToBeDeleted)
   // }
 
-  collectCheckedCategories() {
-    const checkedCategories = this.categories.filter(category => category.checkedControl.value);
-    console.log('Checked Categories:', checkedCategories);
-  }
+  // collectCheckedCategories() {
+  //   const checkedCategories = this.categories.filter(category => category.checkedControl.value);
+  //   console.log('Checked Categories:', checkedCategories);
+  // }
 
 
 
   isValid(input:any){ 
-
-    if(input.value.length>=3  ){
+   
+    console.log('merde',input.value)
+    if(input.value.length>=3 && this.ajoutModeControl){
+      console.log('for too long');
+      
     this.deacButton= this.categories.some((elem:any)=>elem.libelle===input.value)
     }
+    else if(input.value.length>=3 && this.idEdit!=0){
+      this.deacButton= this.categories.some((elem:any)=>elem.libelle===input.value)
+
+    }
+    
     else if(!this.deacButton){
-      this.deacButton=false
+      console.log('sooo');
+      
+      this.deacButton=true
 
     }
   }
@@ -172,10 +193,19 @@ export class CategComponent implements OnInit {
     if(!this.ajoutModeControl  && event.target.checked===true ){
 
       console.log('ibrahim')
-  
+
+
       this.checkedboxes.push(id)
+      if(this.checkedboxes.length===this.categories.length){
+        console.log('they same length')
+        this.head=true
+      }
       console.log('voici id',this.checkedboxes)
       this.deleteBtn=false
+    }
+    else if(!this.ajoutModeControl  && event.target.checked===false){
+
+      this.head=false
     }
 
 
@@ -186,32 +216,37 @@ export class CategComponent implements OnInit {
       console.log(resp)
       this.fetchCategs()
       this.head=false
-
-
-
     })
   }
 
   display(event:any,id:number){
-    console.log(this.ajoutModeControl)
     if(!this.ajoutModeControl){
 
       this.idEdit=id
       let found = this.categories.find((cat)=>cat.id===id)
+      if(found){
+       // this.isEdit=true
       this.modifiedInput=found.libelle
-      this.isEdit=true
+      
+      // if(this.modifiedInput.length>=3  ){
+        
+      // this.deacButton= this.categories.some((elem:any)=>elem.libelle===this.modifiedInput)
+      // }
+      // else if(!this.deacButton){
+        
+      //   this.deacButton=true
+  
+      // }
+      }
+        
     }
     
 
   }
-  switchToEdit(){
-    this.ajoutModeControl=false
-    console.log('here')
-    
-  }
+
 
   checkAll(event:any){
-    if(event.target.checked){
+    if(event.target.checked && !this.ajoutModeControl){
       this.head=true
       this.categories.forEach(cat=>{
       this.isChecked.push(cat.id)
@@ -219,17 +254,11 @@ export class CategComponent implements OnInit {
       })
       this.fetchCategs()
       this.deleteBtn=false
-      
-
     }
     else{
 
       this.isChecked=[]
       this.fetchCategs()
     }
-    
   }
-
-  
 }
-

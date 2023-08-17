@@ -13,7 +13,7 @@
           <form [formGroup]="formT" (ngSubmit)="submitFormFn()" action="" class="d-flex align-items-end">
               <div class="flex-grow-1 me-2">
                   <label for="libelle">Libellé</label>
-                  <input #inputlol (input)="isValid(inputlol)" [(ngModel)]="modifiedInput" type="text" formControlName="libelle" id="libelle" >
+                  <input #inputlol (input)="isValid(inputlol)" [(ngModel)]="modifiedInput" type="text" formControlName="libelle" id="libelle"  >
               </div>
               <button type="submit" class="btn btn-success" [disabled]="deacButton" >OK</button>
           </form>

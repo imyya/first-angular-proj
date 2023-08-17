@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient , HttpHeaders} from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Response } from './interface/response';
+import { Category } from './interface/category';
+import { Data } from './interface/data';
+import { CategoryResponse } from './interface/category-response';
 
 
 @Injectable({
@@ -8,11 +13,11 @@ import { HttpClient , HttpHeaders} from '@angular/common/http';
 export class CategoryService {
  private baseUrl= 'http://127.0.0.1:8000/atelier-api'
   constructor(private http: HttpClient) { }
-  getCategData(page:number){
-    return this.http.get(`${this.baseUrl}/categories/show?page=`+page)
+  getCategData(page:number) :Observable<Response<CategoryResponse>>{
+    return this.http.get<Response<CategoryResponse>>(`${this.baseUrl}/categories/show?page=`+page)
   }
 
-  postData(data:any){
+  postData(data:Category){
     return this.http.post(`${this.baseUrl}/categories/store`,data)
 
   }
@@ -34,7 +39,7 @@ export class CategoryService {
   }
 
   
-  updateData(id: number, newData: any): any {
+  updateData(id: number, newData: Category ): Observable<Response<Category>> {
     const url = `${this.baseUrl}/categories/update/${id}`;
     const options = {
       headers: new HttpHeaders({
@@ -42,7 +47,7 @@ export class CategoryService {
       })
     };
 
-    return this.http.put(url, newData, options);
+    return this.http.put<Response<Category>>(url, newData, options);
   }
 
   getArticleData(page:number){
