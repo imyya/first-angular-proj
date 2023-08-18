@@ -25,7 +25,7 @@
   
    <div class="row align-items-center">
         <h3 class="col-4 mt-5 underline" style="text-decoration: underline;">Liste des catégories</h3>
-        <button class="col-1 btn btn-danger" (click)="delete()" [disabled]="deleteBtn " >Supprimer</button>
+        <button class="col-1 btn btn-danger" (click)="delete()" [disabled]=" deleteBtn  || ajoutModeControl" >Supprimer</button>
     </div>
 
 
@@ -34,7 +34,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th><input class="form-check-input" type="checkbox" (change)="checkAll($event)" [checked]="head" > 
+            <th><input [disabled]="ajoutModeControl" class="form-check-input" type="checkbox" (change)="getChecked($event,null)" [checked]="head" > 
             </th>
             <th>ID</th> 
 
@@ -44,7 +44,7 @@
           <tbody> 
               <tr *ngFor="let category of categories, let i = index ">
                 <td>
-                  <input class="form-check-input" type="checkbox" (change)="areChecked($event,category.id)" [checked]="category.checked" >
+                  <input [disabled]="ajoutModeControl" class="input" type="checkbox" (change)="getChecked($event,category.id)" [checked]="category.checked" >
                 </td>
                 <td (click)="display($event,category.id)">{{ category.id }}</td>
                 <td>{{ category.libelle }}</td>

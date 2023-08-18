@@ -1,22 +1,23 @@
-<form >
+<form [formGroup]="articleForm">
     <!-- 2 column grid layout with text inputs for the first and last names -->
     <div class="row">
         <div class="col-md-6">
           <div class="form-outline" style="margin-bottom: 20px;">
-            <input [(ngModel)]="libelleInput" (input)="updateRef()" name="libelleInput"  type="text" id="form6Example1" class="form-control"  [formControl]="libellecontrol"/>
+            <input  (input)="updateRef()" name="libelleInput"  type="text" id="form6Example1" class="form-control"  formControlName="libelle"/>
             <label class="form-label" for="form6Example1">Libelle</label>
-            <div *ngIf="libellecontrol.hasError('required') && libellecontrol.touched" class="text-danger">
+            <div *ngIf="articleForm.get('libelle')?.hasError('required') && articleForm.get('libelle')?.touched" class="text-danger">
                 Libelle is required
               </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 file-input"style="">
           <div class="form-outline">
-            <input type="file" id="form6Example2" class="form-control" (change)="previewImage($event)" [formControl]="photocontrol" />
+            <input type="file" id="form6Example2" class="form-control" (change)="previewImage($event)" formControlName="photo" />
           </div>
           <div>
             <img *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" style="max-width: 100%; height: auto;">
           </div>
+        
         </div>
     </div>
       
@@ -24,12 +25,12 @@
         <div class="col-md-6">
           <!-- Prix input -->
           <div class="form-outline mb-4">
-            <input [(ngModel)]="prixInput" type="text" id="form6Example3" class="form-control" [formControl]="prixcontrol"/>
+            <input type="text" id="form6Example3" class="form-control" formControlName="prix"/>
             <label class="form-label" for="form6Example3">Prix</label>
-            <div *ngIf="prixcontrol.hasError('required') && prixcontrol.touched" class="text-danger">
+            <div *ngIf="articleForm.get('prix')?.hasError('required') && articleForm.get('prix')?.touched" class="text-danger">
                 prix is required
             </div>
-            <div *ngIf="prixcontrol.hasError('pattern') && prixcontrol.touched" class="text-danger">
+            <div *ngIf="articleForm.get('prix')?.hasError('pattern') && articleForm.get('prix')?.touched" class="text-danger">
               Prix must be a positive integer.
             </div>
             
@@ -37,12 +38,12 @@
       
           <!-- Company name input -->
           <div class="form-outline mb-4">
-            <input [(ngModel)]="stockInput" type="text" id="form6Example4" class="form-control" [formControl]="stockcontrol" />
+            <input [(ngModel)]="stockInput" type="text" id="form6Example4" class="form-control" formControlName="stock" />
             <label class="form-label" for="form6Example4">Stock</label>
-            <div *ngIf="stockcontrol.hasError('required') && stockcontrol.touched " class="text-danger">
+            <div *ngIf="articleForm.get('stock')?.hasError('required') && articleForm.get('stock')?.touched " class="text-danger">
                 stock is required
             </div>
-            <div *ngIf="stockcontrol.hasError('pattern') && stockcontrol.touched" class="text-danger">
+            <div *ngIf="articleForm.get('stock')?.hasError('pattern') && articleForm.get('stock')?.touched " class="text-danger">
               Stock must be a positive integer.
             </div>
           </div>
@@ -50,11 +51,11 @@
       
           <!-- Address input -->
           <div class="form-outline mb-4">
-            <select id="form6Example6" class="form-control"  [(ngModel)]="categorie" (change)="updateRef()" name="categorie"[formControl]="categcontrol">
+            <select id="form6Example6" class="form-control"   (change)="updateRef($event)" name="categorie" formControlName="categ">
                 <option value="0" >Categorie</option>
                 <option *ngFor=" let op of categs" [value]="op.id">{{op.libelle}}</option>
                
-              </select>
+            </select>
             
           </div>
         </div>
@@ -66,17 +67,17 @@
         <div class="col-md-6">
           <!-- Fournisseur select -->
           <div class="form-outline mb-4">
-            <input type="text" id="form6Example5" class="form-control" (input)="searchFournisseurs($event)"  [value]="getSelectedFournisseursText()" [formControl]="fournisseurcontrol" />
+            <input type="text" id="form6Example5" class="form-control" (input)="searchFournisseurs($event)"  [value]="getSelectedFournisseursText()" formControlName="fournisseur" />
             <label class="form-label" for="form6Example5">Fournisseur:</label>
-            <div *ngIf="fournisseurcontrol.hasError('required') && fournisseurcontrol.touched" class="text-danger">
-                fournisseur is required
+            <div *ngIf="articleForm.get('fournisseur')?.hasError('required') && articleForm.get('fournisseur')?.touched " class="text-danger">
+              fournisseur is required
               </div>
           </div>
         </div>
         <div class="col-md-6">
           <!-- REF input -->
           <div class="form-outline mb-4">
-            <input type="text" id="form6Example5" class="form-control" [(ngModel)]="refInput" name="refInput" [formControl]="refcontrol" />
+            <input type="text" id="form6Example5" class="form-control"  name="refInput" formControlName="ref" />
             <label class="form-label" for="form6Example7">REF</label>
           </div>
         </div>

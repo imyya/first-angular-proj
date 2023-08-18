@@ -6,10 +6,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./liste.component.css']
 })
 export class ListeComponent {
-  @Input()
-   liste:any=[]
-   
-   @Output() editArticleClicked = new EventEmitter<number>();
+  @Input() liste:any=[]
+  selectedArticle: any = null
+  @Output() editArticleClicked = new EventEmitter<number>();
 
   // ...
 
@@ -17,4 +16,8 @@ export class ListeComponent {
     console.log('here',articleId)
     this.editArticleClicked.emit(articleId);
 }
+
+
+   
+
 }

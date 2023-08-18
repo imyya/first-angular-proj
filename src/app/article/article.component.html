@@ -1,7 +1,7 @@
 <div class="container">
     <h2 style="margin-bottom: 40px;">Article</h2>
-    <app-form [articleId]="selectedArticle" [categs]="categories" [fournisseurs]="fournisseurs"></app-form>
-    <app-liste [liste]="article"(editArticleClicked)="onEditArticleClicked($event)"></app-liste>
+    <app-form [allArticles]="article" [articleId]="selectedArticle" [categs]="categories" [fournisseurs]="fournisseurs" (submitEvent)="submitArticle($event)"></app-form>
+    <app-liste [liste]="article" ></app-liste>
     <app-pagination
   [currentPage]="currentPage"
   [last]="totalp"

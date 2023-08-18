@@ -17,7 +17,7 @@ export class ArticleService {
   private baseUrl= 'http://127.0.0.1:8000/atelier-api'
   constructor(private http: HttpClient) { }
   getArticleData(page:number):Observable<Response<Articleresponse>>{
-    return this.http.get<Response<Articleresponse>>(`${this.baseUrl}/articles/all?page=`+page)
+    return this.http.get<Response<Articleresponse>>(`${this.baseUrl}/articles/?page=`+page)
   }
 
   getFournisseur():Observable<Response<Category[]>>{

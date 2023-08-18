@@ -17,4 +17,16 @@ label{
     background-color: white;
     cursor: pointer;
 }
+
+.file-input{
+   
+    cursor: pointer;
+    background-color: rgba(136, 133, 133, 0.276);
+  }
   
+  /* Hide the default file input text */
+  /* .form-control[type="file"] {
+    height: 15rem;
+    opacity: 0;
+  }
+   */

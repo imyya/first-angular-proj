@@ -39,12 +39,14 @@ export class CategComponent implements OnInit {
     head=false
     disableInput=true
 
+
     constructor(private breukh:FormBuilder, private categoryService:CategoryService){
 
     }
 
     ngOnInit():void{
     this.fetchCategs()
+    console.log('ajout',this.ajoutModeControl)
     
 
     this.formT=this.breukh.group({
@@ -68,9 +70,7 @@ export class CategComponent implements OnInit {
     this.categories=response.data.categories
     this.last=response.data.last_page
     console.log(this.categories)
-    this.categories.forEach(cat=>{
-      cat.checked=this.isChecked.includes(cat.id)
-    })
+    
      })
      
    }
@@ -131,18 +131,11 @@ export class CategComponent implements OnInit {
       })
       }
       else{
+       let toBeUpdated = this.categories.find(cat=>cat.id===this.idEdit)
+       if(toBeUpdated){
+        toBeUpdated.libelle=this.modifiedInput
+       }
         
-
-        this.categoryService.updateData(this.idEdit,this.formT.value).subscribe(
-          (resp:Response<Category>)=>{
-            this.formT.reset()
-            this.fetchCategs()
-            return resp
-
-
-
-          }
-        )
       }
        
       
@@ -189,34 +182,40 @@ export class CategComponent implements OnInit {
   }
 
   areChecked(event:any,id:number){
+    console.log('one input', event)
 
     if(!this.ajoutModeControl  && event.target.checked===true ){
 
       console.log('ibrahim')
 
-
-      this.checkedboxes.push(id)
+      if(!this.checkedboxes.find(boxid=>boxid===id)){
+        this.checkedboxes.push(id)
+      }
       if(this.checkedboxes.length===this.categories.length){
         console.log('they same length')
         this.head=true
       }
       console.log('voici id',this.checkedboxes)
       this.deleteBtn=false
-    }
+  }
     else if(!this.ajoutModeControl  && event.target.checked===false){
 
       this.head=false
+      this.checkedboxes=this.checkedboxes.filter(box=>box!=id)
+      if(this.checkedboxes.length===0){
+        this.deleteBtn=true
+      }
+      console.log('after removing',this.checkedboxes)
     }
 
 
   }
 
   delete(){
-    this.categoryService.deleteData(this.checkedboxes).subscribe((resp)=>{
-      console.log(resp)
-      this.fetchCategs()
+    this.categories=this.categories.filter(cat=>!this.checkedboxes.includes(cat.id))
+   
       this.head=false
-    })
+    
   }
 
   display(event:any,id:number){
@@ -240,25 +239,148 @@ export class CategComponent implements OnInit {
       }
         
     }
-    
-
+  
   }
+
+  // getChecked(event:any, id:number|null){
+  //   console.log('a lentree', this.categories)
+  //   if(!this.ajoutModeControl  && event.target.checked===true && !id){
+  //    // this.checkedboxes=[]
+  //     console.log('first case: the checkedboxes',this.checkedboxes, 'the categories',this.categories)
+
+  //     this.categories.forEach(cat=>{
+      
+  //      this.checkedboxes.push(cat.id)
+  //       cat.checked=true
+  //     })
+  //     this.categories=this.categories
+  //     console.log('first case the head:',this.head)
+  //   }
+  //   else if(!this.ajoutModeControl  && event.target.checked===false && !id){
+      
+  //     console.log('uncheck dad case: the checkedboxes',this.checkedboxes, 'the categories',this.categories)
+  //     this.categories.forEach(cat=>{
+  //       cat.checked=false
+  //       console.log(cat.id,'is checked',cat.checked )
+
+  //     })
+  //     //this.categories=this.categories
+  //     this.checkedboxes=[]
+
+
+  //   }
+  //   else if(!this.ajoutModeControl && event.target.checked===true && id && this.checkedboxes.length==(this.categories.length-1)){
+  //     if(!this.checkedboxes.includes(id)){
+
+  //       this.checkedboxes.push(id)
+  //     }
+  //     this.head=true
+     
+  //     this.categories.forEach(cat=>{
+  //        cat.checked=true
+         
+  //      })
+  //     console.log('second case head value:',this.head)
+  //     console.log('second case',this.checkedboxes)
+
+
+
+  //   }
+  //   else if(!this.ajoutModeControl && event.target.checked===false && id ){
+  //     console.log('third case checkx',this.checkedboxes)
+  //     this.checkedboxes=this.checkedboxes.filter(box=>box!=id)
+  //     let theUnchecked= this.categories.find(cat=>cat.id==id)
+  //     if(theUnchecked){
+  //       theUnchecked.checked=false
+  //     }
+  //     console.log('third case',this.checkedboxes)
+  //     //this.categories=this.categories
+
+
+  //   }
+  //   else if(!this.ajoutModeControl && event.target.checked===true && id){
+      
+  //     if(!this.checkedboxes.includes(id)){
+
+  //       this.checkedboxes.push(id)
+  //     }
+  //     let newChecked= this.categories.find(cat=>cat.id==id)
+  //     if(newChecked){
+  //       newChecked.checked=true
+  //     }
+      
+  //     console.log('fourth case',this.categories, this.checkedboxes)
+
+  //   }
+
+
+
+  // }
+
+
+  getChecked(event: any, id: number | null) {
+
+    if (!this.ajoutModeControl && !id) {
+      // Clique sur la case a cocher papa
+      this.head = event.target.checked;
+      this.categories.forEach(cat => (cat.checked = this.head));
+      this.checkedboxes = this.head ? this.categories.map(cat => cat.id) : [];
+      this.deleteBtn=!this.head
+    } 
+    else if (!this.ajoutModeControl && id) {
+      // Clique sur les cases enfants
+      const clickedCategory = this.categories.find(cat => cat.id === id);
+      if (clickedCategory) {
+        clickedCategory.checked = event.target.checked;
+        if (event.target.checked) {
+          this.checkedboxes.push(id);
+          this.deleteBtn=false
+
+        } else {
+          this.checkedboxes = this.checkedboxes.filter(box => box !== id);
+          if(this.checkedboxes.length===0){
+
+            this.deleteBtn=!this.deleteBtn
+            console.log('im hahah');
+            
+          }
+        }
+  
+        const allChildrenChecked = this.categories.every(cat => cat.checked);
+        this.head = allChildrenChecked;
+        if(this.head){
+          this.deleteBtn=false
+
+        }
+      }
+    }
+  }
+  
+
 
 
   checkAll(event:any){
+    console.log('event',event)
     if(event.target.checked && !this.ajoutModeControl){
       this.head=true
       this.categories.forEach(cat=>{
-      this.isChecked.push(cat.id)
+      //this.isChecked.push(cat.id)
+      console.log('check all')
       this.checkedboxes.push(cat.id)
       })
-      this.fetchCategs()
+      this.categories.forEach(cat=>{
+        cat.checked=this.checkedboxes.includes(cat.id)
+      })      
       this.deleteBtn=false
     }
     else{
 
       this.isChecked=[]
-      this.fetchCategs()
+      this.checkedboxes=[]
+      this.deleteBtn=true
+      this.categories.forEach(cat=>{
+        cat.checked=this.checkedboxes.includes(cat.id)
+      }) 
     }
   }
 }

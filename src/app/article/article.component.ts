@@ -6,6 +6,7 @@ import { Category } from '../interface/category';
 import { Articleresponse } from '../interface/articleresponse';
 import { Response } from '../interface/response';
 import { Article } from '../interface/article';
+import { Fournisseur } from '../interface/fournisseur';
 
 @Component({
   selector: 'app-article',
@@ -22,7 +23,9 @@ export class ArticleComponent implements OnInit  {
   lastPage: number = 0;
   selectedArticle: any = null;
   categories:Category[]=[]
-  fournisseurs:Category[]=[]
+  fournisseurs:Fournisseur[]=[]
+  all?:Articleresponse
+  
 
 
 constructor(private breukh:FormBuilder, private categoryService:CategoryService, private articleService:ArticleService){
@@ -31,34 +34,38 @@ constructor(private breukh:FormBuilder, private categoryService:CategoryService,
 
 ngOnInit(): void {
   this.fetchArticle()
-  this.fetchcategs()
-  this.fetchFournisseur()
-  
-  
+  //this.fetchcategs()
+  //this.fetchFournisseur()  
+
 }
 
 fetchArticle(){
   this.articleService.getArticleData(this.currentPage).subscribe((response:Response<Articleresponse>)=>{
+    this.all=response.data
     this.article=response.data.articles
+    this.fournisseurs=response.data.fournisseurs
+    this.categories=response.data.categories
+
+
     this.totalp=response.data.last_page
 })
 }
 
 
-fetchcategs(){
-  this.categoryService.allcategs().subscribe((response:any)=>{
-  this.categories=response.data
-  console.log(this.categories)
-  })
-  }
+// fetchcategs(){
+//   this.categoryService.allcategs().subscribe((response:any)=>{
+//   this.categories=response.data
+//   console.log(this.categories)
+//   })
+//   }
 
 
-   fetchFournisseur(){
-    this.articleService.getFournisseur().subscribe((response:Response<Category[]>)=>{
-      this.fournisseurs=response.data
+//    fetchFournisseur(){
+//     this.articleService.getFournisseur().subscribe((response:Response<Category[]>)=>{
+//       this.fournisseurs=response.data
 
-  })
-}
+//   })
+// }
 
 
 
@@ -87,4 +94,16 @@ onEditArticleClicked(articleId: number) {
   console.log('naj',articleId)
   this.selectedArticle = this.article.find(art => art.id === articleId);
 }
+
+submitArticle(article:any){
+  let submittedArticle:any
+  submittedArticle = article
+  this.categoryService.addArticle(article).subscribe(resp=>{
+    console.log(resp)
+   
+
+    
+  })
+ }
 }
+
