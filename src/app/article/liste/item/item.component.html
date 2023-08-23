@@ -1,2 +1,8 @@
-     
-    
+<td style="margin:1rem">{{ item.libelle }}</td>
+<td style="margin:1rem">{{ item.prix }}</td>
+<td style="margin:1rem">{{ item.stock }}</td>
+<td style="margin:1rem">{{ item.categorie.libelle }}</td>
+<td style="margin:1rem">  
+<button class="btn btn-primary btn-sm" style="margin: 25px;"  (click)="onEditArticleClick(item.id)">Editer</button>
+<button class="btn btn-danger btn-sm"  (click)="onDeleteArticleClick(item.id)" >{{deleteButtonText}}</button>
+</td>

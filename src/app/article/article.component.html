@@ -1,7 +1,8 @@
-<div class="container">
+<app-loader *ngIf="loading"></app-loader>
+<div class="container" *ngIf="!loading">
     <h2 style="margin-bottom: 40px;">Article</h2>
-    <app-form [allArticles]="article" [articleId]="selectedArticle" [categs]="categories" [fournisseurs]="fournisseurs" (submitEvent)="submitArticle($event)"></app-form>
-    <app-liste [liste]="article" ></app-liste>
+    <app-form [allArticles]="article" [article]="selectedArticle" [categs]="categories" [fournisseurs]="fournisseurs" (submitEvent)="submitArticle($event)"></app-form>
+    <app-liste [liste]="article" (editArticle)="onEditArticle($event)" (deleteArticle)="onDeleteArticle($event)"></app-liste>
     <app-pagination
   [currentPage]="currentPage"
   [last]="totalp"

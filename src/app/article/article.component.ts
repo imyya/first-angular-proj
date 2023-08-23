@@ -7,6 +7,7 @@ import { Articleresponse } from '../interface/articleresponse';
 import { Response } from '../interface/response';
 import { Article } from '../interface/article';
 import { Fournisseur } from '../interface/fournisseur';
+import { Articlefournisseur } from '../interface/articlefournisseur';
 
 @Component({
   selector: 'app-article',
@@ -16,16 +17,20 @@ import { Fournisseur } from '../interface/fournisseur';
 
 })
 export class ArticleComponent implements OnInit  {
-  currentp:number=1
   totalp:number=1
   article:Article[]=[]
-  currentPage: number = 1;
-  lastPage: number = 0;
-  selectedArticle: any = null;
+  currentPage: number = 1
+  lastPage: number = 0
+  selectedArticle: any = null
   categories:Category[]=[]
   fournisseurs:Fournisseur[]=[]
   all?:Articleresponse
-  
+  articleFournisseurs:Articlefournisseur[]=[]
+  editArticleId:number=0
+  loading:boolean=false
+  per_page:number=3
+
+  fetchedArticles:Article[]=[]
 
 
 constructor(private breukh:FormBuilder, private categoryService:CategoryService, private articleService:ArticleService){
@@ -33,77 +38,97 @@ constructor(private breukh:FormBuilder, private categoryService:CategoryService,
 }
 
 ngOnInit(): void {
-  this.fetchArticle()
-  //this.fetchcategs()
-  //this.fetchFournisseur()  
-
+this.fetchArticle()
 }
+
 
 fetchArticle(){
-  this.articleService.getArticleData(this.currentPage).subscribe((response:Response<Articleresponse>)=>{
-    this.all=response.data
-    this.article=response.data.articles
-    this.fournisseurs=response.data.fournisseurs
-    this.categories=response.data.categories
+  this.loading=true
+  setTimeout(()=>{
 
+    this.articleService.getArticleData(this.currentPage).subscribe((response:Response<Articleresponse>)=>{
+      this.all=response.data
+      this.fetchedArticles=response.data.articles
+      this.fournisseurs=response.data.fournisseurs
+      this.categories=response.data.categories
+      this.loading=false
+      this.totalp = Math.ceil(this.fetchedArticles.length / 3);
+      this.display(this.currentPage)
 
-    this.totalp=response.data.last_page
-})
+  })
+},1000)
+
 }
 
-
-// fetchcategs(){
-//   this.categoryService.allcategs().subscribe((response:any)=>{
-//   this.categories=response.data
-//   console.log(this.categories)
-//   })
-//   }
-
-
-//    fetchFournisseur(){
-//     this.articleService.getFournisseur().subscribe((response:Response<Category[]>)=>{
-//       this.fournisseurs=response.data
-
-//   })
-// }
-
-
-
 // Pagination functions
+
+display(currentp:number){
+  //nbre de page deja depassees=> current_page - 1 x  nbre delement par page
+  //ceci represente lindex a partir duquel on va print les elem de cette page ensuite on print a partir de cette index et jusqua nbre d'elem par page
+  const startingIndex = ((currentp-1)* this.per_page)
+  const endingIndex=startingIndex+this.per_page
+  this.article= this.fetchedArticles.slice(startingIndex,endingIndex);
+ return this.article
+}
+
 next() {
   if (this.currentPage + 1 >= this.totalp) return;
-  this.currentPage++;
-  this.fetchArticle();
+  //this.currentPage++;
+  this.display(this.currentPage++)
 }
 
 previous() {
   console.log(this.currentPage)
   if (this.currentPage - 1 < 1) return;
-  this.currentPage--;
-  this.fetchArticle();
+  //this.currentPage--;
+  this.display(this.currentPage--)
 }
 
 goToPage(page: number) {
   console.log(this.currentPage)
 
   this.currentPage = page;
-  this.fetchArticle();
+  this.display(this.currentPage)
 }
 
-onEditArticleClicked(articleId: number) {
-  console.log('naj',articleId)
+
+onEditArticle(articleId: number) {
+  this.editArticleId=articleId
   this.selectedArticle = this.article.find(art => art.id === articleId);
+  console.log(this.selectedArticle)
 }
 
-submitArticle(article:any){
-  let submittedArticle:any
-  submittedArticle = article
-  this.categoryService.addArticle(article).subscribe(resp=>{
+onDeleteArticle(id:number){
+  console.log('to be deleted', id)
+  this.articleService.delete(id).subscribe((resp:Response<Article>)=>{
     console.log(resp)
-   
-
-    
   })
+  this.article=this.article.filter(ac=>ac.id!=id)
+}
+
+submitArticle(article:FormData){
+//let  submittedArticle = article
+  if(this.editArticleId!=0){
+    this.loading=true
+    this.articleService.update(this.editArticleId,article).subscribe((resp:Response<Article>)=>{
+      console.log(resp)
+      this.fetchArticle()
+      this.article
+      this.loading=false
+
+    })
+    console.log('fuck',this.editArticleId)
+    return
+
+   }
+   this.loading=true
+  this.articleService.addArticle(article).subscribe((resp:Response<Article>)=>{   
+    console.log(resp)
+    this.fetchArticle()
+    this.article
+    this.loading=false
+ })
  }
+
 }
 

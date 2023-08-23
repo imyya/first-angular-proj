@@ -1,3 +1,4 @@
+import { Articlefournisseur } from "./articlefournisseur";
 import { Category } from "./category";
 import { Fournisseur } from "./fournisseur";
 
@@ -7,9 +8,10 @@ export interface Article {
     prix: number,
     stock: number,
     categorie_id: number,
-    REF: string,
-    photo: string,
+    ref: string,
+    image: string,
     categorie:Category
+    fournisseurs:Articlefournisseur[]
     
 }
 

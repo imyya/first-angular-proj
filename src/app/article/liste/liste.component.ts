@@ -8,14 +8,24 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class ListeComponent {
   @Input() liste:any=[]
   selectedArticle: any = null
-  @Output() editArticleClicked = new EventEmitter<number>();
+  @Output() editArticle= new EventEmitter<number>();
+  @Output() deleteArticle= new EventEmitter<number>()
+  @Output() editId!:number
 
   // ...
 
-  onEditArticleClick(articleId: number) {
-    console.log('here',articleId)
-    this.editArticleClicked.emit(articleId);
-}
+  onEditClick(articleId: number) {
+    //console.log('here',articleId)
+    // this.editId=articleId
+    this.editArticle.emit(articleId)
+
+
+  }
+
+  onDeleteClick(id:number){
+    this.deleteArticle.emit(id)
+  }
+
 
 
    

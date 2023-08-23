@@ -11,6 +11,8 @@ import { FormComponent } from './article/form/form.component';
 import { ListeComponent } from './article/liste/liste.component';
 import { PaginationComponent } from './article/pagination/pagination.component';
 import { ItemComponent } from './article/liste/item/item.component';
+import { LoaderComponent } from './loader/loader.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //import { NgxPaginationModule } from 'ngx-pagination';
 
 
@@ -22,7 +24,8 @@ import { ItemComponent } from './article/liste/item/item.component';
     FormComponent,
     ListeComponent,
     PaginationComponent,
-    ItemComponent
+    ItemComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -31,6 +34,8 @@ import { ItemComponent } from './article/liste/item/item.component';
     HttpClientModule,
     //NgxPaginationModule
     FormsModule,
+    BrowserAnimationsModule,
+
     
   
 

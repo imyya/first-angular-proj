@@ -19,20 +19,31 @@ export class ArticleService {
   getArticleData(page:number):Observable<Response<Articleresponse>>{
     return this.http.get<Response<Articleresponse>>(`${this.baseUrl}/articles/?page=`+page)
   }
-
-  getFournisseur():Observable<Response<Category[]>>{
-    return this.http.get<Response<Category[]>>(`${this.baseUrl}/fournisseurs/all`)
-  }
-
-  countArticles(id:number){
-    return this.http.get(`${this.baseUrl}/articles/${id}`)
-
-  }
-
-  addArticle(articleData: Article) {
+  addArticle(articleData: any):Observable<Response<Article>> {
     const headers = new HttpHeaders();
 
-    return this.http.post(`${this.baseUrl}/articles/store`, articleData, { headers });
+    return this.http.post<Response<Article>>(`${this.baseUrl}/articles/store`, articleData, { headers });
   }
+
+  update(id:number, data:any):Observable<Response<Article>>{
+   // const formData = new FormData()
+   data.append('_method', "PUT");
+    // formData.append('json', JSON.stringify(data)); // Convert data to JSON string
+
+    const url = `${this.baseUrl}/articles/${id}`;
+    const options = {
+      headers: new HttpHeaders({
+      })
+    };
+
+    return this.http.post<Response<Article>>(url,data,options);
+
+  }
+
+  delete(id:number):Observable<Response<Article>>{
+    return this.http.delete<Response<Article>>(`${this.baseUrl}/articles/delete/${id}`)
+  }
+
+
 
 }
