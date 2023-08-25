@@ -5,53 +5,56 @@ import { Response } from './interface/response';
 import { Category } from './interface/category';
 import { Data } from './interface/data';
 import { CategoryResponse } from './interface/category-response';
+import { ResponseService } from './response.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategoryService {
- private baseUrl= 'http://127.0.0.1:8000/atelier-api'
+export class CategoryService extends ResponseService<CategoryResponse> {
+//  private baseUrl= 'http://127.0.0.1:8000/atelier-api'
   constructor(private http: HttpClient) { }
-  getCategData(page:number) :Observable<Response<CategoryResponse>>{
-    return this.http.get<Response<CategoryResponse>>(`${this.baseUrl}/categories/show?page=`+page)
-  }
+  // getCategData(page:number) :Observable<Response<CategoryResponse>>{
+  //   return this.http.get<Response<CategoryResponse>>(`${this.baseUrl}/categories/show?page=`+page)
+  // }
 
-  postData(data:Category){
-    return this.http.post(`${this.baseUrl}/categories/store`,data)
+  // postData(data:Category){
+  //   return this.http.post(`${this.baseUrl}/categories/store`,data)
 
-  }
+  // }
 
-  deleteData(data: number[]) {
-    const url = `${this.baseUrl}/categories/delete`;
-    const options = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    };
-    const requestBody = { ids: data }; // Sending the array as an object
+  // deleteData(data: number[]) {
+  //   const url = `${this.baseUrl}/categories/delete`;
+  //   const options = {
+  //     headers: new HttpHeaders({
+  //       'Content-Type': 'application/json',
+  //     }),
+  //   };
+  //   const requestBody = { ids: data }; // Sending the array as an object
   
-    return this.http.delete(url, { ...options, body: requestBody });
-  }
-  allcategs(){
-    return this.http.get(`${this.baseUrl}/categories/all`)
+  //   return this.http.delete(url, { ...options, body: requestBody });
+  // }
+  // allcategs(){
+  //   return this.http.get(`${this.baseUrl}/categories/all`)
 
-  }
+  // }
 
   
-  updateData(id: number, newData: Category ): Observable<Response<Category>> {
-    const url = `${this.baseUrl}/categories/update/${id}`;
-    const options = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
-    };
+  // updateData(id: number, newData: Category ): Observable<Response<Category>> {
+  //   const url = `${this.baseUrl}/categories/update/${id}`;
+  //   const options = {
+  //     headers: new HttpHeaders({
+  //       'Content-Type': 'application/json'
+  //     })
+  //   };
 
-    return this.http.put<Response<Category>>(url, newData, options);
+  //   return this.http.put<Response<Category>>(url, newData, options);
+  // }
+
+
+  protected url(): string {
+    return 'http://127.0.0.1:8000/atelier-api/categories';
   }
-
-
-
 }
   
 
