@@ -57,7 +57,7 @@ export class FormComponent implements OnInit ,OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['article'] && this.article) {
-      //console.log('la photo', this.article.photo)
+      console.log('la photo', this.article)
       this.originalArticle=this.article
       this.editArticleId=this.article.id
       this.categorie=this.article.categorie_id
@@ -204,6 +204,8 @@ export class FormComponent implements OnInit ,OnChanges {
           }
         }
       }
+      updatedFields.append('_method', "PUT");
+
       //updatedFields.append('_method','PUT')
       updatedFields.forEach((value, key) => {
            console.log(`${key}: ${value}`);

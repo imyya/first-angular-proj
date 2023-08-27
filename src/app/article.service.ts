@@ -13,10 +13,9 @@ import { ResponseService } from './response.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ArticleService extends ResponseService<Articleresponse> {
+export class ArticleService extends ResponseService<Response<Article>> {
 
   // private baseUrl= 'http://127.0.0.1:8000/atelier-api'
-   constructor(private http: HttpClient) { }
   // getArticleData(page:number):Observable<Response<Articleresponse>>{
   //   return this.http.get<Response<Articleresponse>>(`${this.baseUrl}/articles/?page=`+page)
   // }
@@ -45,8 +44,8 @@ export class ArticleService extends ResponseService<Articleresponse> {
   //   return this.http.delete<Response<Article>>(`${this.baseUrl}/articles/delete/${id}`)
   // }
 
-  protected url(): string {
-    return 'http://127.0.0.1:8000/atelier-api/articles';
+  override uri(): string {
+    return '/articles';
   }
 
 }

@@ -65,7 +65,7 @@ export class CategComponent implements OnInit {
    
 
  fetchCategs(){
-    this.categoryService.getCategData(this.currentPage).subscribe((response:Response<CategoryResponse>)=>{
+    this.categoryService.index().subscribe((response:Response<CategoryResponse>)=>{
       console.log('response',response.data.categories)
     this.categories=response.data.categories
     this.last=response.data.last_page
@@ -123,7 +123,7 @@ export class CategComponent implements OnInit {
 
     submitFormFn(){
       if(this.ajoutModeControl && this.idEdit===0){
-        this.categoryService.postData(this.formT.value).subscribe(
+        this.categoryService.create(this.formT.value).subscribe(
           (resp)=>{
           console.log(resp)
           this.formT.reset()

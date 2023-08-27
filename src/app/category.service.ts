@@ -11,9 +11,8 @@ import { ResponseService } from './response.service';
 @Injectable({
   providedIn: 'root'
 })
-export class CategoryService extends ResponseService<CategoryResponse> {
+export class CategoryService extends ResponseService<Response<CategoryResponse>> {
 //  private baseUrl= 'http://127.0.0.1:8000/atelier-api'
-  constructor(private http: HttpClient) { }
   // getCategData(page:number) :Observable<Response<CategoryResponse>>{
   //   return this.http.get<Response<CategoryResponse>>(`${this.baseUrl}/categories/show?page=`+page)
   // }
@@ -52,7 +51,7 @@ export class CategoryService extends ResponseService<CategoryResponse> {
   // }
 
 
-  protected url(): string {
+  protected uri(): string {
     return 'http://127.0.0.1:8000/atelier-api/categories';
   }
 }

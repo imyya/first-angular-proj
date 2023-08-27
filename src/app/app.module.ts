@@ -13,6 +13,11 @@ import { PaginationComponent } from './article/pagination/pagination.component';
 import { ItemComponent } from './article/liste/item/item.component';
 import { LoaderComponent } from './loader/loader.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { VenteComponent } from './vente/vente.component';
+import { VformComponent } from './vente/vform/vform.component';
+import { VlisteComponent } from './vente/vliste/vliste.component';
+import { VitemComponent } from './vente/vliste/vitem/vitem.component';
+import { VpaginationComponent } from './vente/vpagination/vpagination.component';
 //import { NgxPaginationModule } from 'ngx-pagination';
 
 
@@ -25,7 +30,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ListeComponent,
     PaginationComponent,
     ItemComponent,
-    LoaderComponent
+    LoaderComponent,
+    VenteComponent,
+    VformComponent,
+    VlisteComponent,
+    VitemComponent,
+    VpaginationComponent
   ],
   imports: [
     BrowserModule,

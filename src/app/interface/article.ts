@@ -1,8 +1,9 @@
 import { Articlefournisseur } from "./articlefournisseur";
+import { Articleresponse } from "./articleresponse";
 import { Category } from "./category";
 import { Fournisseur } from "./fournisseur";
 
-export interface Article {
+export interface Article extends Articleresponse {
     id: number,
     libelle: string,
     prix: number,

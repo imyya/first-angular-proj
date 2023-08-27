@@ -46,10 +46,10 @@ fetchArticle(){
   this.loading=true
   setTimeout(()=>{
 
-    this.articleService.getArticleData(this.currentPage).subscribe((response:Response<Articleresponse>)=>{
+    this.articleService.index().subscribe((response:Response<Articleresponse>)=>{
       this.all=response.data
       this.fetchedArticles=response.data.articles
-      this.fournisseurs=response.data.fournisseurs
+      this.fournisseurs=response.data.providers
       this.categories=response.data.categories
       this.loading=false
       this.totalp = Math.ceil(this.fetchedArticles.length / 3);
@@ -95,7 +95,8 @@ goToPage(page: number) {
 onEditArticle(articleId: number) {
   this.editArticleId=articleId
   this.selectedArticle = this.article.find(art => art.id === articleId);
-  console.log(this.selectedArticle)
+  console.log('rahoof',this.selectedArticle)
+
 }
 
 onDeleteArticle(id:number){
@@ -109,6 +110,7 @@ onDeleteArticle(id:number){
 submitArticle(article:FormData){
 //let  submittedArticle = article
   if(this.editArticleId!=0){
+    console.log('she herezz')
     this.loading=true
     this.articleService.update(this.editArticleId,article).subscribe((resp:Response<Article>)=>{
       console.log(resp)
@@ -122,7 +124,7 @@ submitArticle(article:FormData){
 
    }
    this.loading=true
-  this.articleService.addArticle(article).subscribe((resp:Response<Article>)=>{   
+  this.articleService.create(article).subscribe((resp:Response<Article>)=>{   
     console.log(resp)
     this.fetchArticle()
     this.article

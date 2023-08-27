@@ -6,6 +6,5 @@ export interface Articleresponse {
     articles:Article[],
     last_page:number,
     categories:Category[],
-    fournisseurs:Fournisseur[]
-
+    providers:Fournisseur[]
 }

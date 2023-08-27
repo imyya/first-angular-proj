@@ -1,0 +1,44 @@
+.file-input{
+   
+    cursor: pointer;
+    background-color: rgba(136, 133, 133, 0.112);
+    width: 15rem;
+    height: 5rem;
+    border-radius: 50%;
+    transform: translate(70%,-10%);
+    background-image: url(https://media.istockphoto.com/id/1175387759/vector/camera-icon.jpg?s=612x612&w=0&k=20&c=paC1ZkU31dH2B5epXqT_cYOyca5uqh4v0WpFUldCUBE=);
+    background-repeat: no-repeat;
+    background-size: cover; 
+    border: 1px solid rgba(149, 202, 220, 0.506) ;
+    box-shadow: 5px 5px 2px rgba(128, 128, 128, 0.356);
+  }
+  
+  /* Hide the default file input text */
+  .form-control[type="file"] {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+
+  .ref-div{
+    transform: translate(70%,-10%);
+
+
+  }
+
+  ul{
+    list-style: none;
+    overflow: auto;
+  }
+  
+  li{
+    height: 1.8rem;
+    background-color: white;
+    font-size: 1rem;
+    color: #04121b;
+    border:1px;
+    text-align: center;
+    padding-top: 0.5rem;
+    cursor: pointer;
+
+}

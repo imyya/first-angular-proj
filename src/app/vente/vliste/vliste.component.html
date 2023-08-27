@@ -1,0 +1,21 @@
+<div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Libelle</th>
+          <th>Qte Stock</th>
+          <th>Articles Confection</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr app-vitem [item]="item"   *ngFor="let item of liste" >
+            
+      <!-- app-item [item]="item" (editArticleClicked)="onEditClick($event)" (deleteArticleClicked)="onDeleteClick($event)"></app-item> -->
+  </tr>
+    
+    </tbody> 
+            
+       
+</table>
+</div>

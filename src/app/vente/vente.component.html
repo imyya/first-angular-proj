@@ -1,0 +1,9 @@
+<div class="container">
+    <app-vform [typeVenteCategories]="categoriesTypeVente" [articlesConfectionTab]="articlesConfections"></app-vform>
+    <app-vliste [liste]="articlesVente"></app-vliste>
+    <app-vpagination [currentPage]="currentPage"
+    [last]="totalp"
+    (nextClicked)="next()"
+    (previousClicked)="previous()"
+    (goToPageClicked)="goToPage($event)"></app-vpagination>
+</div>
