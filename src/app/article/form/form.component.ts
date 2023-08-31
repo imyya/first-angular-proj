@@ -67,11 +67,10 @@ export class FormComponent implements OnInit ,OnChanges {
       // let fournisseursLibelle=this.article.fournisseurs.map(f=>{
       //   const fournisseur = this.fournisseurs.find(ff=>ff.id==f.id)
       //   return fournisseur ? fournisseur.libelle :''
-
       // })
-       this.selectedFournisseurs=this.article.fournisseurs.map(f=>{
-        const fournisseur = this.fournisseurs.find(ff=>ff.id==f.id)
-        return fournisseur || '' }) as Fournisseur[]
+      this.selectedFournisseurs=this.article.fournisseurs.map(f=>{
+      const fournisseur = this.fournisseurs.find(ff=>ff.id==f.id)
+      return fournisseur || '' }) as Fournisseur[]
       this.articleForm.patchValue({
       libelle:this.article.libelle,
       prix:this.article.prix,
@@ -80,13 +79,9 @@ export class FormComponent implements OnInit ,OnChanges {
       //fournisseur:fournisseursLibelle.join(','),
       image:this.article.image,
       ref:this.article.ref
-    
      }
-
      )
-     this.submitButtonLabel = this.article ? 'Edit' : 'Enregistrer';
-
-      
+     this.submitButtonLabel = this.article ? 'Edit' : 'Enregistrer'; 
     }
   }
 
@@ -108,13 +103,10 @@ export class FormComponent implements OnInit ,OnChanges {
       const refBase = libellePrefix ? `REF_${libellePrefix}${refSuffix}` : ''
       this.articleForm.get('ref')?.patchValue(refBase);
       return
-
-
     }
     let id!:number
     if(event){
-
-       id = +(event?.target as HTMLSelectElement).value
+      id = +(event?.target as HTMLSelectElement).value
     }
     this.labelTaken = this.allArticles.some(elem=>elem.libelle===this.articleForm.get('libelle')?.value) 
 
@@ -130,17 +122,14 @@ export class FormComponent implements OnInit ,OnChanges {
   }
 
   previewImage(event: any) {
-
     const selectedFile = event.target.files[0]
     console.log('le gars',selectedFile.name);
     if(!this.extensions.includes(selectedFile.name.slice(-3))){
       this.labelTaken=true
       return
     }
-    
     this.articleForm.get('image')?.setValue(selectedFile)
     this.selectedToEditImage=selectedFile
-
     if (selectedFile) {
       const reader = new FileReader();
       reader.onload = (e: any) => {//event handler qui sexecute qd le file reading is done
@@ -153,7 +142,6 @@ export class FormComponent implements OnInit ,OnChanges {
   }
 
   searchFournisseurs(searchTerm: any) {
-    
     let search = searchTerm.target.value
     if(search===''){
      // console.log('tired')
@@ -163,7 +151,6 @@ export class FormComponent implements OnInit ,OnChanges {
     console.log('filtrd',this.filteredFournisseurs)
     this.filteredFournisseurs =this.fournisseurs.filter(
       fournisseur => fournisseur.libelle.toLowerCase().includes(search.toLowerCase()) && !this.selectedFournisseurs.some(f=>f.id===fournisseur.id))
-    
   }
 
   addFournisseur(fournisseur: Fournisseur) {

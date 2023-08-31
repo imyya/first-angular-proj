@@ -1,5 +1,6 @@
 export interface Confection {
-    id:number,
+    article_id:number,
     libelle:string,
-    quantite:number
+    quantite:number,
+    categorie_libelle:string
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Vente } from 'src/app/interface/vente';
 import { Input } from '@angular/core';
 
@@ -9,4 +9,14 @@ import { Input } from '@angular/core';
 })
 export class VlisteComponent {
 @Input() liste:Vente[]=[]
+@Output() deleteEvent=new EventEmitter<number>
+@Output() editEvent=new EventEmitter<number>
+
+
+onDeleteClicked(id:number){
+this.deleteEvent.emit(id)
+}
+onEditClicked(id:number){
+this.editEvent.emit(id)
+}
 }

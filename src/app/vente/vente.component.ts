@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ArticleVenteService } from '../article-vente.service';
 import { Response } from '../interface/response';
 import { Vente } from '../interface/vente';
@@ -8,16 +8,20 @@ import { ArticleService } from '../article.service';
 import { Articleresponse } from '../interface/articleresponse';
 import { Article } from '../interface/article';
 import { Category } from '../interface/category';
+import { VformComponent } from './vform/vform.component';
+import { Form } from '@angular/forms';
 
 @Component({
   selector: 'app-vente',
   templateUrl: './vente.component.html',
   styleUrls: ['./vente.component.css']
 })
-export class VenteComponent implements OnInit {
+export class VenteComponent implements OnInit{
   constructor(private venteService :ArticleVenteService, private articleService: ArticleService){
 
   }
+
+
 
   fetchedArticlesVente:Vente[]=[]
   articlesVente:Vente[]=[]
@@ -28,6 +32,8 @@ export class VenteComponent implements OnInit {
   totalp:number=1
   categories:Category[]=[]
   categoriesTypeVente:Category[]=[]
+  toBeEdittedArticle!:Vente | null
+  articleId:number=0 
 
   ngOnInit(): void {
     this.fetchArticleVente()
@@ -36,22 +42,19 @@ export class VenteComponent implements OnInit {
 
   fetchArticleVente(){
     this.venteService.index().subscribe((resp:Responsse<Vente>)=>{
-      this.fetchedArticlesVente=resp.data
-      this.totalp = Math.ceil(this.fetchedArticlesVente.length / 3);
-      this.display(this.currentPage)
-
-
-
+    this.fetchedArticlesVente=resp.data
+    console.log('fucck',this.fetchedArticlesVente);
+    
+    this.totalp = Math.ceil(this.fetchedArticlesVente.length / 3);
+    this.display(this.currentPage)
     })
   }
   fetchArticleConfection(){
     this.articleService.index().subscribe((response:Response<Articleresponse>)=>{
-     this.articlesConfections=response.data.articles
-     this.categories=response.data.categories
-     this.categoriesTypeVente=response.data.categories.filter(catg=>catg.type==='VENTE')
-     console.log(this.articlesConfections)
-     
-
+    this.articlesConfections=response.data.articles
+    this.categories=response.data.categories
+    this.categoriesTypeVente=response.data.categories.filter(catg=>catg.type==='VENTE')
+    console.log(this.articlesConfections)
   })
   }
   next() {
@@ -81,7 +84,29 @@ export class VenteComponent implements OnInit {
     this.articlesVente= this.fetchedArticlesVente.slice(startingIndex,endingIndex);
    return this.articlesVente
   }
-  
-  
 
+  submitFn(article:FormData){
+    if(this.articleId!==0){
+
+      this.venteService.update(this.articleId, article).subscribe((resp:Responsse<Vente>)=>{
+        console.log(resp)
+      })
+      return
+    }
+    this.venteService.create(article).subscribe((resp:Responsse<Vente>)=>{   
+  })
+  }
+
+  onDelete(id:number){
+    this.venteService.delete(id).subscribe((resp:Responsse<Vente>)=>{
+      console.log(resp)
+    })
+    this.articlesVente=this.articlesVente.filter(ac=>ac.id!=id)
+
+  }
+
+  onEdit(id:number){
+    this.toBeEdittedArticle=this.fetchedArticlesVente.find(art=>art.id===id) || null
+    this.articleId=id
+  }
 }

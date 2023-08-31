@@ -5,11 +5,16 @@
           <th>Libelle</th>
           <th>Qte Stock</th>
           <th>Articles Confection</th>
-          <th>Action</th>
+          <th>Action 
+          </th>
+          <th>
+          </th>
+          <th>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr app-vitem [item]="item"   *ngFor="let item of liste" >
+        <tr app-vitem [item]="item"   *ngFor="let item of liste" (deleteEvent)="onDeleteClicked($event)" (editEvent)="onEditClicked($event)" >
             
       <!-- app-item [item]="item" (editArticleClicked)="onEditClick($event)" (deleteArticleClicked)="onDeleteClick($event)"></app-item> -->
   </tr>

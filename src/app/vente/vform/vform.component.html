@@ -1,15 +1,18 @@
-<form [formGroup]="formgrp" (ngSubmit)="submit()">
+<form [formGroup]="formgrp" (ngSubmit)="submit">
    
     <div class="row mt-5">
       <div class="col-md-6">
         <div class="row mb-3">
             <div class="col-md-6">
               <label for="libelle">Libellé</label>
-              <input type="text" class="form-control" id="libelle" name="libelle" formControlName="libelle" (input)="updateRef()">
+              <input type="text" class="form-control" id="libelle" name="libelle" formControlName="libelle" (input)="updateRef()" [class.invalid]="formgrp.get('libelle')?.invalid && (formgrp.get('libelle')?.dirty || formgrp.get('libelle')?.touched)">
+              <div *ngIf="formgrp.get('libelle')?.hasError('required') && (formgrp.get('libelle')?.dirty || formgrp.get('libelle')?.touched)" class="text-danger">
+                Libelle is required
+              </div>
             </div>
             <div class="col-md-6">
               <label for="categorie">Catégorie</label>
-              <select class="form-select" id="categorie" name="categorie" (change)="updateRef($event)" >
+              <select class="form-select" id="categorie" name="categorie" (change)="updateRef($event)" formControlName="categorie_id" >
                 <option value="0"></option>
                 <option  *ngFor="let categ of typeVenteCategories"  [value]="categ.id">{{categ.libelle}}</option>
               </select>
@@ -24,7 +27,13 @@
             </div>
             <div class="col-md-6" *ngIf="promoChecked">
               <label for="autreChamp">Valeur</label>
-              <input type="text" class="form-control" id="autreChamp" name="autreChamp" formControlName="promoValue">
+              <input type="text" class="form-control" id="autreChamp" name="autreChamp" formControlName="promo">
+              <div *ngIf="formgrp.get('promoValue')?.hasError('required') && (formgrp.get('promoValue')?.dirty || formgrp.get('promoValue')?.touched)" class="text-danger">
+                Promo is required
+              </div>
+              <div *ngIf="formgrp.get('promoValue')?.hasError('pattern') && formgrp.get('promoValue')?.touched" class="text-danger">
+                Promo must be a positive integer.
+              </div>
             </div>
         </div>
         <div class="row mb-3">
@@ -34,15 +43,14 @@
             </div>
             <div class="col-md-6">
                 <button class="btn btn-primary" (click)="addConfection()">+</button>
-                <!-- Génération du tableau (divs) ici -->
             </div>
             <div>
 
             </div>
             <div class="col-md-6">
 
-              <div formArrayName="confections"  *ngFor="let table of confections.controls; let i=index">
-                <div [formGroupName]="i">
+              <div >
+                <div >
   
                   <table class="table" >
                     <thead>
@@ -51,11 +59,11 @@
                         <th>Stock</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
+                    <tbody formArrayName="confections"  >
+                      <tr *ngFor="let table of confections.controls; let i=index" [formGroupName]="i">
                         <td><input type="text" class="form-control" name="libelle" formControlName="libelle" (input)="searchConfection($event,i)"> 
                           <ul #fournisseurUl  *ngIf="isUlActive(i)"  >
-                          <li *ngFor="let confec of filteredConfections" (click)="selectConfection(confec,i)">
+                          <li *ngFor="let confec of filteredConfections" (click)="selectConfection(confec,i)" >
                             {{confec.libelle}}
                           </li>
                           </ul>
@@ -66,10 +74,16 @@
                     </tbody>
                   </table>
                  
-                  
+                
     
                 </div>
                 
+                </div>
+                <div *ngIf="confectionsInvalid" style="color: red;">
+                  On doit avoir au moins 3 articles de type TISSU, FILS, BOUTON
+                </div>
+                <div *ngIf="rowOrderError" style="color: red;">
+                  Veuillez remplir la row precendente
                 </div>
               
             </div>
@@ -80,11 +94,11 @@
         <div class="row mb-3">
             <div class="col-md-6">
               <label for="libelle">Cout Fabrication</label>
-              <input type="text" class="form-control" id="libelle" name="libelle" formControlName="coutFabrication">
+              <input type="text" class="form-control" id="libelle" name="libelle" formControlName="coutFabrication" (input)="calculateAndSetPrixValue()">
             </div>
             <div class="col-md-6">
                 <label for="libelle">Marge/Article</label>
-                <input type="text" class="form-control" id="libelle" name="libelle" formControlName="marge">
+                <input type="text" class="form-control" id="libelle" name="libelle" formControlName="marge" (input)="calculateAndSetPrixValue()">
                 <div *ngIf="formgrp.get('marge')?.hasError('margeRange')" style="color: red;">
                   Marge doit etre comprise entre 5000 and 1/3 du cout de fabrication.
                 </div>
@@ -92,9 +106,14 @@
         </div>
         <div class="row mb-3  ">
             <div class="col-md-6">
+              <div class="d-flex">
+                <i class="bi bi-arrow-up-circle"></i>
+                <i class="bi bi-arrow-down-circle ml-2"></i>
+              </div>
+              
               <div class="form-check">
-                <input class="form-control" type="text" id="" name="" formControlName="prix">
                 <label  for="promo">Prix Vente</label>
+                <input class="form-control" type="text" id="" name="" formControlName="prix">
               </div>
             </div>
         </div>
@@ -118,13 +137,16 @@
                       <div style="width: 100%; height: 100%; position: relative;">
                         <div class="form-outline" style="position: absolute; width: 100%; height: 100%;">
                         </div>
-                        <img
-                          [src]="imagePreview"
-                          alt=" "
+                        <img *ngIf="imagePreview || this.toBeEdittedArticle?.image"
+                        [src]="imagePreview ? imagePreview:'http://127.0.0.1:8000/storage/' +  this.toBeEdittedArticle?.image"
+                          alt="Image Preview "
                           style="width: 100%; height: 100%; display: block;"
                         />
                       </div>
                     </label>
+                    <div *ngIf="formgrp.get('image')?.hasError('required')" class="text-danger">
+                      Image is required
+                   </div>
                 </div>
           </div>
         </div>  
@@ -136,7 +158,7 @@
           </div>
           <div class="col-md-6 d-flex justify-content-end align-items-end"> <!-- Add classes to control alignment -->
 
-            <button  type="submit" class="btn btn-primary  mb-4 subutn">submit</button>
+            <button [disabled]="!(formgrp.valid && !confectionsInvalid)"  type="submit" class="btn btn-primary  mb-4 subutn" (click)="submit()">{{submitButtonLabel}}</button>
             </div>
         </div>
       

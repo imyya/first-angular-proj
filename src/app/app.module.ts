@@ -18,6 +18,7 @@ import { VformComponent } from './vente/vform/vform.component';
 import { VlisteComponent } from './vente/vliste/vliste.component';
 import { VitemComponent } from './vente/vliste/vitem/vitem.component';
 import { VpaginationComponent } from './vente/vpagination/vpagination.component';
+import { NgConfirmModule } from 'ng-confirm-box';
 //import { NgxPaginationModule } from 'ngx-pagination';
 
 
@@ -35,7 +36,7 @@ import { VpaginationComponent } from './vente/vpagination/vpagination.component'
     VformComponent,
     VlisteComponent,
     VitemComponent,
-    VpaginationComponent
+    VpaginationComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,6 +46,8 @@ import { VpaginationComponent } from './vente/vpagination/vpagination.component'
     //NgxPaginationModule
     FormsModule,
     BrowserAnimationsModule,
+    NgConfirmModule
+
 
     
   
