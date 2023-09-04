@@ -1,9 +1,10 @@
 import { Component, EventEmitter, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, FormControl } from '@angular/forms';
 import { Input } from '@angular/core';
 import { Category } from 'src/app/interface/category';
 import { Article } from 'src/app/interface/article';
 import { Vente } from 'src/app/interface/vente';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-vform',
@@ -14,6 +15,7 @@ export class VformComponent implements OnInit, OnChanges {
 constructor(private groupmdr: FormBuilder){}
 @Input() typeVenteCategories:Category[]=[]
 @Input() articlesConfectionTab:Article[]=[]
+@Input() articlesVenteTab:Vente[]=[]
 @Output() submitEvent= new EventEmitter<any>
 formgrp!:FormGroup
 promoChecked:boolean=false
@@ -35,15 +37,17 @@ editMode:number=0
 submitButtonLabel='Save'
 editRef=''
 originalArticle:any
-
-
-
-
+labelTaken:boolean=false
+firstRowEmptyError:boolean=false
+wrongFileType:boolean=false
+oneThird!:number
+check!:boolean
+quantityError!:boolean
 ngOnInit(): void {
   this.formgrp=this.groupmdr.group({
     confections:this.groupmdr.array([]),
     libelle:['',Validators.required],
-    categorie_id:['',Validators.required],
+    categorie_id:['',[Validators.required, this.noZeroCategoryValidator]],
     promo:['',[Validators.pattern(/^\d+$/), Validators.min(0)]],
     coutFabrication:[''],
     marge:['',[Validators.required, this.margeValidator()]],
@@ -51,10 +55,14 @@ ngOnInit(): void {
     ref:[''],
     image:[[''],Validators.required]
   })
-  this.confections.valueChanges.subscribe(() => {
+  //.pipe(debounceTime(200))
+  this.confections.valueChanges
+  .subscribe(() => {
     const totalCost = this.calculateTotalCost();
     this.formgrp.get('coutFabrication')?.patchValue(totalCost);
     this.fabricationCout=totalCost
+    this.calculateAndSetPrixValue()
+    
   })
   // this.formgrp.get('prix')?.valueChanges.subscribe(()=>{
   //   this.calculateAndSetPrixValue()
@@ -67,7 +75,6 @@ ngOnChanges(changes: SimpleChanges): void {
     this.originalArticle=this.toBeEdittedArticle
     console.log('good days',this.toBeEdittedArticle)
    this.modifiedConfections= this.toBeEdittedArticle?.confections.map(conf=>{
-    console.log('mssss',conf);
     const article = this.articlesConfectionTab.find(article=>article.id===conf.article_id)
     if(article){
       this.selectedConfection.push(article)
@@ -77,16 +84,25 @@ ngOnChanges(changes: SimpleChanges): void {
     this.addControlConfection(conf)
     return conf
    })   
+   this.toBeEdittedArticle.promo!==0? this.promoChecked=!this.promoChecked : this.promoChecked=this.promoChecked
    this.editRef=this.toBeEdittedArticle.ref
    this.formgrp?.patchValue(this.toBeEdittedArticle)
    this.submitButtonLabel = 'Edit' 
   }
 }
 
+noZeroCategoryValidator(control:FormControl){
+  if(control.value==0){
+    return {noZero:true}
+  }
+  return null
+}
+
 calculateAndSetPrixValue(): void {
-  const margeValue = +this.formgrp.get('marge')?.value || 0;
-  const coutFabricationValue = +this.formgrp.get('coutFabrication')?.value || 0;
-  const prixValue = margeValue + coutFabricationValue;
+  let margeValue = +this.formgrp.get('marge')?.value || 0;  
+  let coutFabricationValue = +this.formgrp.get('coutFabrication')?.value || 0;
+  console.log('cout fabrication',coutFabricationValue);
+  let prixValue = margeValue + coutFabricationValue;
   this.formgrp.get('prix')?.patchValue(prixValue);
 }
 
@@ -98,7 +114,46 @@ get confections():FormArray{
   return this.formgrp.controls['confections'] as FormArray
 }
 
+remove(index:number){
+  if(index===0){
+    this.firstRowEmptyError=false
+  }
+this.confections.removeAt(index)
+}
+
+handlePrixWhenRemove(index:number){
+
+}
+
+handleRemove(event:any,index:number){
+  
+  if(!this.confections.at(index).get('libelle')?.value || !this.confections.at(index).get('quantite')?.value){
+    this.remove(index)
+    console.log('the index',index);
+    return
+  }
+  console.log('the index',index)
+  console.log('smol',this.confections.at(index)?.get('quantite')?.value);
+  console.log('before remove',this.selectedConfection, 'index',index);
+  const prix = +this.selectedConfection[index].prix 
+  const qte = +this.confections.at(index).get('quantite')?.value
+  console.log('boob',qte);
+  
+  const coutFabricationValue = +this.formgrp.get('coutFabrication')?.value || 0;
+  this.formgrp.get('coutFabriaction')?.patchValue(coutFabricationValue-(prix*qte))
+  this.selectedConfection.splice(index,1)
+  console.log('remove handler', this.selectedConfection)
+  this.remove(index)
+}
+
 addConfection(){
+  for (let i = 0; i < this.confections.length; i++) {
+    if(!(this.confections.at(i).get('libelle')?.value && this.confections.at(i).get('quantite')?.value)){
+      this.firstRowEmptyError=true
+      return
+    }
+  }
+  this.firstRowEmptyError=false
  this.addControlConfection({article_id:'',libelle:'',quantite:'',categorie_libelle:''})
 }
 logFormValues() {
@@ -110,7 +165,7 @@ logFormValues() {
 
 updateRef(event?:Event){
   if(!event && this.editMode!==0){
-    // this.confectionsInvalid = !this.articlesConfectionTab.some(elem=>elem.libelle===this.formgrp.get('libelle')?.value) 
+    this.labelTaken = !this.articlesVenteTab.some(elem=>elem.libelle===this.formgrp.get('libelle')?.value) 
     let refSuffix= this.editRef.slice(7)
     console.log(refSuffix)
     let libellePrefix = this.formgrp.value.libelle.slice(0,3).toUpperCase()
@@ -123,6 +178,7 @@ updateRef(event?:Event){
     id = +(event?.target as HTMLSelectElement).value
   }
   // this.confectionsInvalid = this.articlesConfectionTab.some(elem=>elem.libelle===this.formgrp.get('libelle')?.value) 
+   this.labelTaken = this.articlesVenteTab.some(elem=>elem.libelle.toLowerCase()===this.formgrp.get('libelle')?.value.toLowerCase()) 
   let categ = this.typeVenteCategories.find(cat=>cat.id==+id); 
   let libellePrefix = this.formgrp.value.libelle.slice(0,3).toUpperCase()
   let categPrefix = categ ? categ.libelle.toUpperCase():''
@@ -136,7 +192,7 @@ updateRef(event?:Event){
 previewImage(event: any) {
   const selectedFile = event.target.files[0] 
   if(!this.extensions.includes(selectedFile.name.slice(-3))){
-   // this.labelTaken=true
+    this.wrongFileType=true
     return
   }
  else if (selectedFile) {
@@ -157,39 +213,55 @@ previewImage(event: any) {
 isUlActive(index:number){
   return this.ulActive===index
 }
+
+
 searchConfection(searchTerm: any, index:number) {
 
  if(this.editMode!==0){
   this.ulActive=index
   console.log('index',index);
-  
   let search = searchTerm.target.value
   if(search===''){
     this.selectedConfection.splice(index,1)
+    this.confections.at(index).get('quantite')?.patchValue('')
+    return
+  }
+  else if (/[^a-zA-Z]/.test(search)){
+    this.confections.at(index).get('libelle')?.patchValue('')
     return
   }
   this.filteredConfections =this.articlesConfectionTab.filter(   
-  confection => confection.libelle.toLowerCase().includes(search.toLowerCase())&& !this.selectedConfection.some(conf=>conf.id===confection.id))  
+  confection => confection.libelle.toLowerCase().startsWith(search.toLowerCase())&& !this.selectedConfection.some(conf=>conf.id===confection.id))  
  }
  else{
-   if(index >0 && !(this.confections.at(index-1).get('libelle')?.value && this.confections.at(index-1).get('quantite')?.value)){
-     this.confections.at(index).get('libelle')?.patchValue('')
-     this.rowOrderError=true
-     return
-   }
-   this.rowOrderError=false
+
    let search = searchTerm.target.value
    this.ulActive=index
-   if(search===''){
+   if (/[^a-zA-Z]/.test(search)){
+    this.confections.at(index).get('libelle')?.patchValue('')
+    return
+  }
+   else if(search===''){
      this.filteredConfections=[]
      return
    }
+   
     this.filteredConfections =this.articlesConfectionTab.filter(
-    confection => confection.libelle.toLowerCase().includes(search.toLowerCase()) && !this.selectedConfection.some(conf=>conf.id===confection.id))
+    confection => confection.libelle.toLowerCase().startsWith(search.toLowerCase()) && !this.selectedConfection.some(conf=>conf.id===confection.id))
    
  }
 }
 
+quantiteHandler(event:any,index:number){
+  if(isNaN(event.target.value) ){
+    this.confections.at(index).get('quantite')?.patchValue('')
+  }
+  else if(!this.confections.at(index).get('libelle')?.value){
+    this.confections.at(index).get('quantite')?.patchValue('')
+    this.quantityError=true
+  }
+
+}
 selectConfection(confection:Article, index:number){
   console.log('bieste',confection.categorie.libelle)
   this.confections.at(index).get('libelle')?.patchValue(confection.libelle)
@@ -219,14 +291,13 @@ handleConfectionsType(){
   //.slice(8).slice(0,-2)) 
   const types:string[]=['fils','bouton','tissu']
   this.existingTypes=this.selectedConfection.filter(conf=>types.includes(conf.categorie.libelle)
-)
-  this.confectionValidator()
+) 
+  const valid = types.every(type=>this.existingTypes.some(t=>t.categorie.libelle===type))
+  this.confectionsInvalid=!valid
+  //this.confectionValidator()
   
 }
-confectionValidator(){
-  const valid= this.existingTypes.length >=3
-  this.confectionsInvalid=!valid
-}
+
 validateConfections(){
   return (control: AbstractControl):ValidationErrors | null=>{
     const confections = control.value
@@ -247,9 +318,10 @@ margeValidator()  {
     if(!margeValue){
       return null;
     }
+    
     const coutFabricationValue =+ this.formgrp.get('coutFabrication')?.value;
-    const oneThird = coutFabricationValue / 3
-    const isValid=margeValue >= 5000 && margeValue <= oneThird
+    this.oneThird = parseFloat((coutFabricationValue / 3).toFixed(2))
+    const isValid=margeValue >= 5000 && margeValue <= this.oneThird
     return !isValid? { margeRange: true }:null
     // if (margeValue >= 5000 && margeValue <= oneThird) {
     //   return null

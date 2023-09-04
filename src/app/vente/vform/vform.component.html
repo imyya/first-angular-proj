@@ -9,6 +9,9 @@
               <div *ngIf="formgrp.get('libelle')?.hasError('required') && (formgrp.get('libelle')?.dirty || formgrp.get('libelle')?.touched)" class="text-danger">
                 Libelle is required
               </div>
+              <div *ngIf="labelTaken" style="color:red">
+                Libelle already taken
+              </div>
             </div>
             <div class="col-md-6">
               <label for="categorie">Catégorie</label>
@@ -16,12 +19,17 @@
                 <option value="0"></option>
                 <option  *ngFor="let categ of typeVenteCategories"  [value]="categ.id">{{categ.libelle}}</option>
               </select>
+              <div *ngIf="(formgrp.get('categorie_id')?.hasError('required') || formgrp.get('categorie_id')?.hasError('noZero'))  && (formgrp.get('categorie_id')?.dirty || formgrp.get('categorie_id')?.touched)" class="text-danger">
+                Select a category
+              </div>
+              <div *ngIf="formgrp.get('categorie_id')?.hasError('noZero')" style="color:red">
+              </div>
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
               <div class="form-check">
-                <input class="form-check-input" style="height: 1rem; width: 1rem;" type="checkbox" id="promo" name="promo" (click)="toggleCheck()">
+                <input class="form-check-input" style="height: 1rem; width: 1rem;" type="checkbox" id="promo" name="promo" (click)="toggleCheck()" [checked]="check">
                 <label class="form-check-label" for="promo">Promo</label>
               </div>
             </div>
@@ -57,6 +65,7 @@
                       <tr>
                         <th>Libellé</th>
                         <th>Stock</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody formArrayName="confections"  >
@@ -67,10 +76,18 @@
                             {{confec.libelle}}
                           </li>
                           </ul>
-                        </td>
-                      
-                        <td><input type="text" class="form-control" name="stock" formControlName="quantite"></td>
+                        </td>                      
+                        <td><input type="text" class="form-control" name="stock" formControlName="quantite" (input)="quantiteHandler($event,i)"></td>
+                       
+                        <td > <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-octagon" viewBox="0 0 16 16" style="margin-top: 1rem; cursor:pointer" (click)="handleRemove($event, i)">
+                          <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>
+                          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg> </td>
+
                       </tr>
+                      <div *ngIf="quantityError" class="text-danger">
+                        Veuillez d'abord renseignerle libelle 
+                      </div>
                     </tbody>
                   </table>
                  
@@ -85,6 +102,9 @@
                 <div *ngIf="rowOrderError" style="color: red;">
                   Veuillez remplir la row precendente
                 </div>
+                <div *ngIf="firstRowEmptyError" style="color:red">
+                  Veuillez remplir la row precendente
+                </div>
               
             </div>
             
@@ -94,26 +114,30 @@
         <div class="row mb-3">
             <div class="col-md-6">
               <label for="libelle">Cout Fabrication</label>
-              <input type="text" class="form-control" id="libelle" name="libelle" formControlName="coutFabrication" (input)="calculateAndSetPrixValue()">
+              <input readonly type="text" class="form-control" id="libelle" name="libelle" formControlName="coutFabrication" (input)="calculateAndSetPrixValue()">
             </div>
             <div class="col-md-6">
                 <label for="libelle">Marge/Article</label>
                 <input type="text" class="form-control" id="libelle" name="libelle" formControlName="marge" (input)="calculateAndSetPrixValue()">
-                <div *ngIf="formgrp.get('marge')?.hasError('margeRange')" style="color: red;">
-                  Marge doit etre comprise entre 5000 and 1/3 du cout de fabrication.
+                <div *ngIf="formgrp.get('marge')?.hasError('margeRange') " style="color: red;">
+                  Marge doit etre comprise entre 5000 et {{oneThird}}.
                 </div>
               </div>
         </div>
         <div class="row mb-3  ">
             <div class="col-md-6">
-              <div class="d-flex">
-                <i class="bi bi-arrow-up-circle"></i>
-                <i class="bi bi-arrow-down-circle ml-2"></i>
-              </div>
               
               <div class="form-check">
                 <label  for="promo">Prix Vente</label>
-                <input class="form-control" type="text" id="" name="" formControlName="prix">
+                <input class="form-control" type="text" id="" name="" formControlName="prix" readonly>
+              </div>
+              <div class="d-flex" style="margin-top: 1.6rem ;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-right: 1rem; cursor:pointer">
+                  <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="cursor: pointer;">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                </svg>
               </div>
             </div>
         </div>
@@ -147,6 +171,9 @@
                     <div *ngIf="formgrp.get('image')?.hasError('required')" class="text-danger">
                       Image is required
                    </div>
+                   <div *ngIf="wrongFileType" style="color:red">
+                    Wrong file type
+                  </div>
                 </div>
           </div>
         </div>  

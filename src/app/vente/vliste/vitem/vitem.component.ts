@@ -12,7 +12,7 @@ export class VitemComponent {
 @Input() item!:Vente
 @Output() deleteEvent= new EventEmitter<number>
 @Output() editEvent= new EventEmitter<number>
-confirmService= inject(NgConfirmService)
+confirmService = inject(NgConfirmService)
 
 delete(itemId:number){
   this.confirmService.showConfirm('Etes vous sure de vouloir supprimer',()=>{

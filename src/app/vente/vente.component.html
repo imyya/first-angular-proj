@@ -1,5 +1,5 @@
 <div class="container">
-    <app-vform (submitEvent)="submitFn" [typeVenteCategories]="categoriesTypeVente" [articlesConfectionTab]="articlesConfections" (submitEvent)="submitFn($event)" [toBeEdittedArticle] ="toBeEdittedArticle" ></app-vform>
+    <app-vform (submitEvent)="submitFn" [typeVenteCategories]="categoriesTypeVente" [articlesConfectionTab]="articlesConfections" (submitEvent)="submitFn($event)" [toBeEdittedArticle] ="toBeEdittedArticle" [articlesVenteTab]="fetchedArticlesVente" ></app-vform>
     <app-vliste [liste]="articlesVente" (deleteEvent)="onDelete($event)" (editEvent)="onEdit($event)"></app-vliste>
     <app-vpagination [currentPage]="currentPage"
     [last]="totalp"

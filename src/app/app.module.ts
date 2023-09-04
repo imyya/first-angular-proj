@@ -19,9 +19,25 @@ import { VlisteComponent } from './vente/vliste/vliste.component';
 import { VitemComponent } from './vente/vliste/vitem/vitem.component';
 import { VpaginationComponent } from './vente/vpagination/vpagination.component';
 import { NgConfirmModule } from 'ng-confirm-box';
+import { RouterModule, Routes } from '@angular/router';
 //import { NgxPaginationModule } from 'ngx-pagination';
 
-
+const routes:Routes=[
+  {
+    path:'category', component:CategComponent
+  }
+  ,
+  {
+    path:'confection', component:ArticleComponent
+  }
+  ,
+  {
+    path:'vente', component:VenteComponent
+  },
+  {
+    path:'', redirectTo:'confection', pathMatch:'full'
+  }
+]
 @NgModule({
   declarations: [
     AppComponent,
@@ -46,7 +62,8 @@ import { NgConfirmModule } from 'ng-confirm-box';
     //NgxPaginationModule
     FormsModule,
     BrowserAnimationsModule,
-    NgConfirmModule
+    NgConfirmModule,
+    RouterModule.forRoot(routes)
 
 
     
@@ -57,4 +74,6 @@ import { NgConfirmModule } from 'ng-confirm-box';
   providers: [],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }
+
